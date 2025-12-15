@@ -1,1 +1,699 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ GAMER KEY SYSTEM ⚡</title>
+    <style>
+        /* === RESET & VARIÁVEIS === */
+        :root {
+            --cor-principal: #6c5ce7; /* Roxo */
+            --cor-secundaria: #a29bfe; /* Roxo Claro */
+            --cor-fundo: #1a1a2e; /* Fundo Escuro */
+            --cor-card: #20204088; /* Fundo Card com transparência */
+            --cor-texto: #ffffff;
+            --cor-sucesso: #00b894;
+            --cor-erro: #d63031;
+            --sombra-principal: 0 0 20px var(--cor-principal);
+            --sombra-vidro: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--cor-fundo);
+            color: var(--cor-texto);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+            background-image: radial-gradient(circle, #2c2c4f 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* === CONTAINER PRINCIPAL === */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* === TERMINAL (INPUT DE COMANDOS) === */
+        .terminal-container {
+            background-color: #111119;
+            padding: 15px 20px;
+            border-radius: 15px;
+            border: 2px solid var(--cor-principal);
+            box-shadow: var(--sombra-principal);
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .terminal-container span {
+            color: var(--cor-sucesso);
+            font-weight: bold;
+            margin-right: 10px;
+            font-family: monospace;
+            white-space: nowrap;
+        }
+
+        #commandInput {
+            flex-grow: 1;
+            background: none;
+            border: none;
+            color: var(--cor-texto);
+            font-size: 1em;
+            outline: none;
+            padding: 5px;
+            font-family: monospace;
+        }
+
+        /* === DASHBOARD === */
+        #dashboard {
+            display: none; /* Escondido por padrão */
+            background: var(--cor-card);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: var(--sombra-vidro), var(--sombra-principal);
+            padding: 30px;
+            display: grid;
+            gap: 25px;
+            grid-template-columns: 1fr;
+        }
+
+        @media (min-width: 768px) {
+            #dashboard {
+                grid-template-columns: 1fr 2fr;
+            }
+        }
+
+        /* === PAINEL ESQUERDO (CRÉDITOS E GERADOR) === */
+        .panel-left {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .credit-display {
+            background-color: var(--cor-principal);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: var(--sombra-principal);
+            transition: transform 0.3s;
+        }
+
+        .credit-display:hover {
+            transform: scale(1.02);
+        }
+
+        .credit-display h2 {
+            margin-bottom: 10px;
+            font-size: 1.5em;
+        }
+
+        .credit-display p {
+            font-size: 3em;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        /* GERADOR DE KEYS */
+        .key-generator {
+            padding: 20px;
+            background: var(--cor-card);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .key-generator h2 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: var(--cor-secundaria);
+            text-align: center;
+        }
+
+        .key-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+        }
+
+        .btn-generate {
+            background-color: #3b3b75;
+            color: var(--cor-texto);
+            border: none;
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            font-size: 0.9em;
+        }
+
+        .btn-generate:hover {
+            background-color: var(--cor-principal);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(108, 92, 231, 0.6);
+        }
+
+        .btn-generate:active {
+            transform: translateY(0);
+        }
+
+        /* === PAINEL DIREITO (KEYS ATIVAS) === */
+        .panel-right {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .active-keys-list h2 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            color: var(--cor-secundaria);
+            text-align: center;
+        }
+
+        #keysList {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .key-item {
+            background: #3b3b7599;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border-left: 5px solid var(--cor-secundaria);
+            transition: background 0.3s;
+        }
+
+        .key-item:hover {
+            background: #4a4a8d99;
+        }
+
+        .key-info {
+            flex-grow: 1;
+        }
+
+        .key-info strong {
+            display: block;
+            font-size: 1.2em;
+            margin-bottom: 5px;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+
+        .key-timer {
+            font-size: 0.9em;
+            color: #ccc;
+        }
+
+        .btn-cancel {
+            background-color: var(--cor-erro);
+            color: var(--cor-texto);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 15px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+
+        .btn-cancel:hover {
+            background-color: #ff4757;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            background: #3b3b7544;
+            border-radius: 15px;
+            color: var(--cor-secundaria);
+            font-style: italic;
+        }
+
+        /* === MODAL DE SENHA === */
+        .modal-overlay {
+            display: none; /* Escondido por padrão */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--cor-fundo);
+            padding: 30px;
+            border-radius: 20px;
+            border: 2px solid var(--cor-principal);
+            box-shadow: var(--sombra-principal), 0 0 40px rgba(108, 92, 231, 0.5);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 20px;
+            color: var(--cor-secundaria);
+        }
+
+        #passwordInput {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 2px solid var(--cor-principal);
+            background-color: #111119;
+            color: var(--cor-texto);
+            font-size: 1.1em;
+            outline: none;
+        }
+
+        #passwordInput:focus {
+            border-color: var(--cor-secundaria);
+            box-shadow: 0 0 5px var(--cor-secundaria);
+        }
+
+        #submitPasswordBtn {
+            background-color: var(--cor-principal);
+            color: var(--cor-texto);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        #submitPasswordBtn:hover {
+            background-color: var(--cor-secundaria);
+        }
+
+        /* === MENSAGENS E FEEDBACK === */
+        #message {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: var(--cor-texto);
+            font-weight: bold;
+            z-index: 1001;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            display: none;
+        }
+
+        .msg-success {
+            background-color: var(--cor-sucesso);
+        }
+
+        .msg-error {
+            background-color: var(--cor-erro);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="terminal-container">
+            <span>user@system:~$</span>
+            <input type="text" id="commandInput" placeholder="Digite um comando, ex: /credits 500">
+        </div>
+
+        <div id="dashboard">
+            <div class="panel-left">
+                <div class="credit-display">
+                    <h2>💳 Seus Créditos</h2>
+                    <p id="currentCredits">0</p>
+                </div>
+
+                <div class="key-generator">
+                    <h2>🔑 Gerador de Keys</h2>
+                    <div class="key-buttons">
+                        <button class="btn-generate" data-dias="1" data-custo="25">1 Dia (25 C)</button>
+                        <button class="btn-generate" data-dias="5" data-custo="55">5 Dias (55 C)</button>
+                        <button class="btn-generate" data-dias="10" data-custo="76">10 Dias (76 C)</button>
+                        <button class="btn-generate" data-dias="20" data-custo="100">20 Dias (100 C)</button>
+                        <button class="btn-generate" data-dias="30" data-custo="145">30 Dias (145 C)</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-right">
+                <div class="active-keys-list">
+                    <h2>⏳ Keys Ativas</h2>
+                    <div id="keysList">
+                        <div class="empty-state">Nenhuma Key Ativa. Gere uma no painel ao lado!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="passwordModal">
+            <div class="modal-content">
+                <h3>🔐 Autenticação Necessária</h3>
+                <input type="password" id="passwordInput" placeholder="Digite a senha de admin">
+                <button id="submitPasswordBtn">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="message"></div>
+
+    <script>
+        const CORRETA_PASSWORD = "evolFF";
+        let userCredits = 0;
+        let activeKeys = [];
+        let pendingCreditAmount = 0; // Armazena a quantidade de créditos até a senha ser confirmada
+
+        // IDs dos elementos
+        const commandInput = document.getElementById('commandInput');
+        const dashboard = document.getElementById('dashboard');
+        const passwordModal = document.getElementById('passwordModal');
+        const passwordInput = document.getElementById('passwordInput');
+        const submitPasswordBtn = document.getElementById('submitPasswordBtn');
+        const currentCreditsDisplay = document.getElementById('currentCredits');
+        const keysList = document.getElementById('keysList');
+        const messageDisplay = document.getElementById('message');
+
+        // --- FUNÇÕES DE UTILIDADE ---
+
+        /**
+         * Exibe uma mensagem de feedback na tela (Toast).
+         * @param {string} msg - A mensagem a ser exibida.
+         * @param {string} type - 'success' ou 'error'.
+         */
+        function showMessage(msg, type) {
+            messageDisplay.textContent = msg;
+            messageDisplay.className = '';
+            messageDisplay.classList.add(type === 'success' ? 'msg-success' : 'msg-error');
+            messageDisplay.style.display = 'block';
+
+            setTimeout(() => {
+                messageDisplay.style.display = 'none';
+            }, 3000);
+        }
+
+        /**
+         * Atualiza o display de créditos no dashboard.
+         */
+        function updateCreditDisplay() {
+            currentCreditsDisplay.textContent = userCredits;
+            // Salva o estado dos créditos no LocalStorage (simulação de persistência)
+            localStorage.setItem('userCredits', userCredits);
+        }
+
+        /**
+         * Gera uma Key no formato MAX-XXXXYYYY.
+         * @returns {string} A Key gerada.
+         */
+        function generateKey() {
+            const randomChunk = () => Math.random().toString(36).substring(2, 6).toUpperCase();
+            return `MAX-${randomChunk()}${randomChunk()}`;
+        }
+
+        /**
+         * Renderiza a lista de keys ativas.
+         */
+        function renderKeys() {
+            keysList.innerHTML = '';
+            
+            if (activeKeys.length === 0) {
+                keysList.innerHTML = `<div class="empty-state">Nenhuma Key Ativa. Gere uma no painel ao lado!</div>`;
+                return;
+            }
+
+            activeKeys.forEach(key => {
+                const now = Date.now();
+                const timeLeft = key.expiry - now;
+
+                if (timeLeft <= 0) return; // Keys expiradas são ignoradas
+
+                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+
+                const keyItem = document.createElement('div');
+                keyItem.classList.add('key-item');
+                keyItem.innerHTML = `
+                    <div class="key-info">
+                        <strong>${key.value}</strong>
+                        <span class="key-timer" id="timer-${key.id}">⏳ Válido por: ${days}d ${hours}h</span>
+                    </div>
+                    <button class="btn-cancel" data-key-id="${key.id}">Cancelar</button>
+                `;
+                keysList.appendChild(keyItem);
+            });
+            
+            // Re-checa o estado de vazio após a filtragem
+            if (keysList.children.length === 0) {
+                 keysList.innerHTML = `<div class="empty-state">Nenhuma Key Ativa. Gere uma no painel ao lado!</div>`;
+            }
+
+            // Salva o estado das keys no LocalStorage (simulação de persistência)
+            localStorage.setItem('activeKeys', JSON.stringify(activeKeys));
+        }
+
+        /**
+         * Atualiza o contador regressivo de todas as keys.
+         */
+        function updateTimers() {
+            const now = Date.now();
+            let keysChanged = false;
+
+            activeKeys = activeKeys.filter(key => {
+                const timeLeft = key.expiry - now;
+                const timerElement = document.getElementById(`timer-${key.id}`);
+
+                if (timeLeft <= 0) {
+                    // Key expirou
+                    keysChanged = true;
+                    showMessage(`🔑 Key ${key.value} expirou e foi removida.`, 'error');
+                    return false; // Remove a key
+                }
+
+                if (timerElement) {
+                    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+                    
+                    // Exibe apenas dias/horas se houver mais de 1 hora restante
+                    if (days > 0 || hours > 0) {
+                       timerElement.textContent = `⏳ Válido por: ${days}d ${hours}h`;
+                    } else {
+                       // Se for menos de 1h, mostra horas/min/seg
+                       timerElement.textContent = `⏳ EXPIRANDO: ${hours}h ${minutes}m ${seconds}s`;
+                    }
+                }
+                return true;
+            });
+
+            if (keysChanged) {
+                renderKeys(); // Força a re-renderização para remover as expiradas
+            }
+        }
+
+        // --- LÓGICA DO TERMINAL E AUTENTICAÇÃO ---
+
+        /**
+         * Processa os comandos digitados no terminal.
+         * @param {string} command - O comando completo digitado.
+         */
+        function processCommand(command) {
+            command = command.trim();
+            commandInput.value = ''; // Limpa o input
+
+            if (!command.startsWith('/credits')) {
+                showMessage(`⚠️ Comando inválido. Use o formato: /credits <quantidade>`, 'error');
+                return;
+            }
+
+            const parts = command.split(' ');
+            if (parts.length !== 2) {
+                showMessage(`⚠️ Formato incorreto. Exemplo: /credits 500`, 'error');
+                return;
+            }
+
+            const amount = parseInt(parts[1], 10);
+            if (isNaN(amount) || amount <= 0) {
+                showMessage(`⚠️ Quantidade inválida. Deve ser um número positivo.`, 'error');
+                return;
+            }
+
+            // Abre o modal para autenticação
+            pendingCreditAmount = amount;
+            passwordInput.value = '';
+            passwordModal.style.display = 'flex';
+            passwordInput.focus();
+        }
+
+        /**
+         * Lida com a tentativa de login no modal.
+         */
+        function handlePasswordSubmit() {
+            const enteredPassword = passwordInput.value;
+            passwordModal.style.display = 'none'; // Fecha o modal
+
+            if (enteredPassword === CORRETA_PASSWORD) {
+                userCredits += pendingCreditAmount;
+                updateCreditDisplay();
+                dashboard.style.display = 'grid'; // Mostra o Dashboard
+                showMessage(`✅ ${pendingCreditAmount} Créditos adicionados! Dashboard Liberado.`, 'success');
+            } else {
+                showMessage(`❌ Senha incorreta. Nenhuma ação realizada.`, 'error');
+            }
+            pendingCreditAmount = 0; // Reseta o valor pendente
+        }
+
+        // --- LÓGICA DO GERADOR DE KEYS ---
+
+        /**
+         * Lida com a geração de uma nova Key.
+         * @param {number} days - Quantidade de dias de validade.
+         * @param {number} cost - Custo em créditos.
+         */
+        function handleKeyGeneration(days, cost) {
+            if (userCredits < cost) {
+                showMessage(`❌ Saldo insuficiente! Você precisa de ${cost} créditos.`, 'error');
+                return;
+            }
+
+            userCredits -= cost;
+            updateCreditDisplay();
+
+            const newKey = {
+                id: Date.now(), // ID único para a key
+                value: generateKey(),
+                duration: days,
+                creation: Date.now(),
+                expiry: Date.now() + (days * 24 * 60 * 60 * 1000)
+            };
+
+            activeKeys.push(newKey);
+            renderKeys();
+            showMessage(`✅ Key ${newKey.value} gerada com sucesso! (${days} dias)`, 'success');
+        }
+
+        // --- LÓGICA DO CANCELAMENTO ---
+
+        /**
+         * Lida com o cancelamento de uma Key ativa.
+         * @param {string} keyId - O ID da key a ser cancelada.
+         */
+        function handleKeyCancel(keyId) {
+            const idToRemove = parseInt(keyId, 10);
+            const keyIndex = activeKeys.findIndex(key => key.id === idToRemove);
+
+            if (keyIndex !== -1) {
+                const keyValue = activeKeys[keyIndex].value;
+                activeKeys.splice(keyIndex, 1); // Remove do array
+                renderKeys();
+                showMessage(`🗑️ Key ${keyValue} cancelada e removida.`, 'error');
+            }
+        }
+
+        // --- EVENT LISTENERS E INICIALIZAÇÃO ---
+
+        /**
+         * Carrega o estado inicial do LocalStorage.
+         */
+        function loadInitialState() {
+            const savedCredits = localStorage.getItem('userCredits');
+            const savedKeys = localStorage.getItem('activeKeys');
+
+            // Carrega créditos, se existirem
+            if (savedCredits) {
+                userCredits = parseInt(savedCredits, 10);
+                updateCreditDisplay();
+            }
+
+            // Carrega keys, se existirem e filtra as expiradas imediatamente
+            if (savedKeys) {
+                try {
+                    activeKeys = JSON.parse(savedKeys);
+                    const now = Date.now();
+                    // Garante que a data de validade é um número (corrigindo possíveis erros de persistência)
+                    activeKeys = activeKeys.map(key => ({...key, expiry: parseInt(key.expiry, 10)}));
+                    activeKeys = activeKeys.filter(key => key.expiry > now);
+                } catch (e) {
+                    activeKeys = [];
+                }
+            }
+
+            // Se tiver créditos, mostra o dashboard
+            if (userCredits > 0 || activeKeys.length > 0) {
+                 dashboard.style.display = 'grid';
+            }
+
+            renderKeys();
+        }
+
+        // 1. Terminal (Enter)
+        commandInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                processCommand(commandInput.value);
+            }
+        });
+
+        // 2. Modal (Botão Confirmar)
+        submitPasswordBtn.addEventListener('click', handlePasswordSubmit);
+
+        // 3. Modal (Enter no input de senha)
+        passwordInput.addEventListener('keypress', (e) => {
+             if (e.key === 'Enter') {
+                handlePasswordSubmit();
+            }
+        });
+
+        // 4. Geração de Keys
+        document.querySelectorAll('.btn-generate').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const days = parseInt(e.currentTarget.dataset.dias, 10);
+                const cost = parseInt(e.currentTarget.dataset.custo, 10);
+                handleKeyGeneration(days, cost);
+            });
+        });
+
+        // 5. Cancelamento de Keys (usando delegação de eventos)
+        keysList.addEventListener('click', (e) => {
+            if (e.target.classList.contains('btn-cancel')) {
+                const keyId = e.target.dataset.keyId;
+                handleKeyCancel(keyId);
+            }
+        });
+
+        // 6. Loop de Atualização do Tempo (Contador Regressivo)
+        setInterval(updateTimers, 1000); // Atualiza a cada 1 segundo
+
+        // 7. Inicialização
+        document.addEventListener('DOMContentLoaded', loadInitialState);
+
+    </script>
+</body>
+</html>
 
